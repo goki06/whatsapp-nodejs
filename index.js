@@ -3,19 +3,13 @@ import qrcode from 'qrcode-terminal';
 import express from 'express';
 import puppeteer from 'puppeteer';
 
-<<<<<<< HEAD
-const { Client, LocalAuth } = pkg;
-
-=======
->>>>>>> Fixed Puppeteer executable path
 const app = express();
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: puppeteer.executablePath()  // Verwende den mitgelieferten Chrome
     });
 
     const client = new Client({
