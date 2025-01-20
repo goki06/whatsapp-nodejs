@@ -1,17 +1,17 @@
 import pkg from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import express from 'express';
-import puppeteer from 'puppeteer-extra';
+import puppeteer from 'puppeteer';
 
-// Chromium automatisch von Puppeteer laden lassen
+const { Client, LocalAuth } = pkg;
+const app = express();
+
 (async () => {
     console.log("Launching Chromium...");
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
-
-    const { Client, LocalAuth } = pkg;
 
     const client = new Client({
         puppeteer: {
@@ -40,7 +40,6 @@ import puppeteer from 'puppeteer-extra';
         console.error("Error during client initialization:", error);
     }
 
-    const app = express();
     app.get('/send', async (req, res) => {
         const { number, message } = req.query;
         if (!number || !message) {
