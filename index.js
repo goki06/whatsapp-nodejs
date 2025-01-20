@@ -1,14 +1,14 @@
-import pkg from 'whatsapp-web.js';
+import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import express from 'express';
 import puppeteer from 'puppeteer';
 
-const { Client, LocalAuth } = pkg;
 const app = express();
 
 (async () => {
     console.log("Launching Chromium...");
     const browser = await puppeteer.launch({
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
