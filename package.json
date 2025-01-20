@@ -1,11 +1,12 @@
 {
   "name": "whatsapp-nodejs",
   "version": "1.0.0",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "npx puppeteer install"
   },
+  "type": "module",
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",
