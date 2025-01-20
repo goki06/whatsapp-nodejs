@@ -2,7 +2,6 @@
   "name": "whatsapp-nodejs",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js",
     "postinstall": "node install-chrome.cjs"
@@ -12,5 +11,6 @@
     "puppeteer": "^24.1.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.21.0"
-  }
+  },
+  "type": "commonjs"
 }
