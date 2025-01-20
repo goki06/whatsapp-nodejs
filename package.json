@@ -5,13 +5,9 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "WhatsApp Web automation with Node.js and Puppeteer",
   "dependencies": {
     "express": "^4.21.2",
-    "puppeteer": "^24.1.0",
+    "puppeteer-core": "^24.1.0",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.21.0"
   }
