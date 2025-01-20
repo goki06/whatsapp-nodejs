@@ -5,8 +5,12 @@ const puppeteer = require('puppeteer-core');
 
 const app = express();
 
-// Definiere den richtigen Chromium-Pfad für Render.com
-const CHROME_PATH = process.env.CHROME_PATH || '/usr/bin/chromium';
+// Suche nach einem verfügbaren Chromium-Pfad
+const CHROME_PATH =
+    process.env.CHROME_PATH ||
+    '/usr/bin/chromium' ||
+    '/usr/bin/google-chrome-stable' ||
+    '/usr/bin/google-chrome';
 
 const client = new Client({
     puppeteer: {
@@ -24,6 +28,10 @@ client.on('qr', qr => {
 
 client.on('ready', () => {
     console.log('WhatsApp bot is ready!');
+});
+
+client.on('disconnected', reason => {
+    console.log('Client was logged out', reason);
 });
 
 app.get('/send', async (req, res) => {
