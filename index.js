@@ -1,17 +1,17 @@
-import whatsappWeb from 'whatsapp-web.js';
-import qrcode from 'qrcode-terminal';
-import express from 'express';
-import puppeteer from 'puppeteer';
-
-const { Client, LocalAuth } = whatsappWeb;
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+const express = require('express');
+const puppeteer = require('puppeteer-core');
 
 const app = express();
 
 (async () => {
+    console.log("Launching Chromium...");
+
     const browser = await puppeteer.launch({
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const client = new Client({
@@ -30,19 +30,31 @@ const app = express();
         console.log('WhatsApp bot is ready!');
     });
 
+    client.on('disconnected', (reason) => {
+        console.log('WhatsApp bot was disconnected:', reason);
+    });
+
     app.get('/send', async (req, res) => {
         const { number, message } = req.query;
         if (!number || !message) {
             return res.status(400).send('Please provide number and message');
         }
+
         const chatId = number + "@c.us";
-        await client.sendMessage(chatId, message);
-        res.send('Message sent to ' + number);
+
+        try {
+            await client.sendMessage(chatId, message);
+            res.send(`Message sent to ${number}`);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            res.status(500).send("Failed to send message");
+        }
     });
 
     await client.initialize();
 
-    app.listen(process.env.PORT || 3000, () => {
-        console.log('Server is running on port ' + (process.env.PORT || 3000));
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
     });
 })();
