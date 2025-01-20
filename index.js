@@ -9,7 +9,7 @@ const app = express();
     console.log("Launching Chromium...");
 
     const browser = await puppeteer.launch({
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable',
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
@@ -30,18 +30,12 @@ const app = express();
         console.log('WhatsApp bot is ready!');
     });
 
-    client.on('disconnected', (reason) => {
-        console.log('WhatsApp bot was disconnected:', reason);
-    });
-
     app.get('/send', async (req, res) => {
         const { number, message } = req.query;
         if (!number || !message) {
             return res.status(400).send('Please provide number and message');
         }
-
         const chatId = number + "@c.us";
-
         try {
             await client.sendMessage(chatId, message);
             res.send(`Message sent to ${number}`);
