@@ -9,7 +9,7 @@ const app = express();
     console.log("Launching Chromium...");
 
     const browser = await puppeteer.launch({
-        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',  // Korrekte Chromium-Pfade für Render
+        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
         headless: true,
         args: [
             '--no-sandbox',
