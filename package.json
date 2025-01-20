@@ -6,7 +6,10 @@
     "start": "node index.js",
     "postinstall": "npx puppeteer install"
   },
-  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",
