@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer');
 
 (async () => {
     try {
-        console.log('Installing Chromium...');
-        const browser = await puppeteer.launch();
-        console.log('Chromium installed successfully.');
-        await browser.close();
+        console.log('Installing Chromium using Puppeteer...');
+        const browserFetcher = puppeteer.createBrowserFetcher();
+        const revisionInfo = await browserFetcher.download('1108766'); // Bestimmte Chromium-Version
+        console.log('Chromium installed successfully at:', revisionInfo.executablePath);
     } catch (error) {
         console.error('Error installing Chromium:', error);
         process.exit(1);
