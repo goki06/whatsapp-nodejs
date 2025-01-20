@@ -6,7 +6,8 @@ const puppeteer = require('puppeteer');
 const app = express();
 
 (async () => {
-    // Start Puppeteer mit automatisch installiertem Chromium
+    console.log("Launching Chromium...");
+
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']

@@ -1,8 +1,8 @@
 {
   "name": "whatsapp-nodejs",
   "version": "1.0.0",
-  "type": "commonjs",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
