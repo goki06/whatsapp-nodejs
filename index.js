@@ -6,17 +6,12 @@ const puppeteer = require('puppeteer');
 const app = express();
 
 (async () => {
-    let executablePath;
-    try {
-        // Ermittelt den richtigen Chromium-Pfad automatisch für Render
-        executablePath = puppeteer.executablePath();
-    } catch (error) {
-        console.error('Error finding Chromium executable path:', error);
-    }
+    const browserFetcher = puppeteer.createBrowserFetcher();
+    const revisionInfo = await browserFetcher.download('1259');  // Stelle sicher, dass Puppeteer Chromium herunterlädt
 
     const client = new Client({
         puppeteer: {
-            executablePath: executablePath || '/usr/bin/chromium-browser',  // Fallback-Pfad für Chromium
+            executablePath: revisionInfo.executablePath,
             headless: true,
             args: [
                 '--no-sandbox',
@@ -29,7 +24,7 @@ const app = express();
                 '--disable-backgrounding-occluded-windows'
             ],
         },
-        authStrategy: new LocalAuth() // Speichert die Sitzung lokal
+        authStrategy: new LocalAuth()
     });
 
     client.on('qr', qr => {
