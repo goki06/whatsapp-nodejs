@@ -4,9 +4,9 @@
   "description": "A WhatsApp bot using whatsapp-web.js and Puppeteer",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "start": "node index.js",
+  "postinstall": "apt-get update && apt-get install -y chromium"
+}
   "keywords": [],
   "author": "Dein Name",
   "license": "ISC",
