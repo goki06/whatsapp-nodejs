@@ -3,6 +3,9 @@ const qrcode = require('qrcode-terminal');
 const express = require('express');
 const puppeteer = require('puppeteer-core');
 
+const browserFetcher = puppeteer.createBrowserFetcher();
+const revisionInfo = await browserFetcher.download('1198496');  // Beispiel für eine Chromium-Version
+
 const app = express();
 
 (async () => {
