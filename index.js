@@ -8,9 +8,9 @@ const app = express();
 (async () => {
     const client = new Client({
         puppeteer: {
-            executablePath: puppeteer.executablePath(),
+            executablePath: process.env.CHROME_PATH || puppeteer.executablePath(),  // Render erwartet den Chrome-Pfad
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         },
         authStrategy: new LocalAuth()
     });
@@ -58,4 +58,5 @@ const app = express();
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
+
 })();
