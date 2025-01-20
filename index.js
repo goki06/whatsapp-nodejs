@@ -1,53 +1,36 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
 const express = require('express');
+const puppeteer = require('puppeteer');
 
 const app = express();
 
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: "render-session" }),
     puppeteer: {
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    }
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    },
+    authStrategy: new LocalAuth()
 });
 
 client.on('qr', qr => {
-    console.log('Scan this QR code with your WhatsApp app:');
-    qrcode.generate(qr, { small: true });
+    console.log('QR Code erhalten. Scanne ihn mit deiner WhatsApp-App.');
 });
 
 client.on('ready', () => {
     console.log('WhatsApp bot is ready!');
 });
 
-client.on('authenticated', () => {
-    console.log('Authenticated successfully!');
-});
-
-client.on('auth_failure', msg => {
-    console.error('Authentication failure:', msg);
-});
-
 app.get('/send', async (req, res) => {
     const { number, message } = req.query;
     if (!number || !message) {
-        return res.status(400).send('Please provide number and message');
+        return res.status(400).send('Bitte gebe Nummer und Nachricht an.');
     }
-
-    try {
-        const chatId = number + "@c.us";
-        await client.sendMessage(chatId, message);
-        res.send('Message sent to ' + number);
-    } catch (error) {
-        res.status(500).send('Error sending message: ' + error.message);
-    }
+    const chatId = number + "@c.us";
+    await client.sendMessage(chatId, message);
+    res.send('Nachricht gesendet an ' + number);
 });
 
 client.initialize();
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(process.env.PORT || 3000, () => {
+    console.log('Server läuft auf Port ' + (process.env.PORT || 3000));
 });
