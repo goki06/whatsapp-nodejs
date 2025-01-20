@@ -7,7 +7,7 @@ const app = express();
 
 const client = new Client({
     puppeteer: {
-        executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome-stable',  // Render erwartet den Chrome-Pfad
+        executablePath: puppeteer.executablePath(), // Nutzt die von Puppeteer bereitgestellte Chromium-Version
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     },
