@@ -1,18 +1,20 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
 const express = require('express');
-const puppeteer = require('puppeteer');
 
 const app = express();
 
 const client = new Client({
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,  // Versteckter Modus für Serverumgebungen
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],  // Notwendige Argumente für Render
     },
-    authStrategy: new LocalAuth()
+    authStrategy: new LocalAuth()  // Speichert die Sitzung lokal
 });
 
 client.on('qr', qr => {
-    console.log('QR Code erhalten. Scanne ihn mit deiner WhatsApp-App.');
+    console.log('Scan this QR code with your WhatsApp app:');
+    qrcode.generate(qr, { small: true });
 });
 
 client.on('ready', () => {
@@ -22,15 +24,15 @@ client.on('ready', () => {
 app.get('/send', async (req, res) => {
     const { number, message } = req.query;
     if (!number || !message) {
-        return res.status(400).send('Bitte gebe Nummer und Nachricht an.');
+        return res.status(400).send('Please provide number and message');
     }
     const chatId = number + "@c.us";
     await client.sendMessage(chatId, message);
-    res.send('Nachricht gesendet an ' + number);
+    res.send('Message sent to ' + number);
 });
 
 client.initialize();
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log('Server läuft auf Port ' + (process.env.PORT || 3000));
+    console.log('Server is running on port ' + (process.env.PORT || 3000));
 });
