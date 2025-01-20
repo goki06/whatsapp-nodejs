@@ -1,33 +1,28 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
-const express = require('express');
-const puppeteer = require('puppeteer-core');
-
-const browserFetcher = puppeteer.createBrowserFetcher();
-const revisionInfo = await browserFetcher.download('1198496');  // Beispiel für eine Chromium-Version
+import { Client, LocalAuth } from 'whatsapp-web.js';
+import qrcode from 'qrcode-terminal';
+import express from 'express';
+import puppeteer from 'puppeteer-core';
 
 const app = express();
 
 (async () => {
     console.log("Launching Chromium...");
 
-    const browser = await puppeteer.launch({
-        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-software-rasterizer',
-            '--disable-background-timer-throttling',
-            '--disable-renderer-backgrounding',
-            '--disable-backgrounding-occluded-windows'
-        ],
-    });
-
     const client = new Client({
-        puppeteer: { browser },
+        puppeteer: {
+            executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--disable-software-rasterizer',
+                '--disable-background-timer-throttling',
+                '--disable-renderer-backgrounding',
+                '--disable-backgrounding-occluded-windows'
+            ],
+        },
         authStrategy: new LocalAuth()
     });
 
@@ -74,5 +69,4 @@ const app = express();
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
-
 })();
