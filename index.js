@@ -1,9 +1,15 @@
-const { Client } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
 
 const app = express();
-const client = new Client();
+const client = new Client({
+    authStrategy: new LocalAuth(),  // Speichert die Session lokal
+    puppeteer: {
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    }
+});
 
 client.on('qr', qr => {
     console.log('Scan this QR code with your WhatsApp app:');
@@ -20,12 +26,17 @@ app.get('/send', async (req, res) => {
         return res.status(400).send('Please provide number and message');
     }
     const chatId = number + "@c.us";
-    await client.sendMessage(chatId, message);
-    res.send('Message sent to ' + number);
+    try {
+        await client.sendMessage(chatId, message);
+        res.send('Message sent to ' + number);
+    } catch (error) {
+        res.status(500).send('Error sending message: ' + error.message);
+    }
 });
 
 client.initialize();
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
