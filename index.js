@@ -1,13 +1,15 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 
 const app = express();
 
 (async () => {
-    console.log("Downloading Chromium...");
+    console.log("Launching Chromium...");
+
     const browser = await puppeteer.launch({
+        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',  // Korrekte Chromium-Pfade für Render
         headless: true,
         args: [
             '--no-sandbox',
