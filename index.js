@@ -1,7 +1,9 @@
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import pkg from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import express from 'express';
 import puppeteer from 'puppeteer';
+
+const { Client, LocalAuth } = pkg;
 
 const app = express();
 
