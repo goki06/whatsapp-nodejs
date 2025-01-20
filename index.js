@@ -1,19 +1,17 @@
 import pkg from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import express from 'express';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
 
-const { Client, LocalAuth } = pkg;
-
-const app = express();
-
+// Chromium automatisch von Puppeteer laden lassen
 (async () => {
     console.log("Launching Chromium...");
-
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
+
+    const { Client, LocalAuth } = pkg;
 
     const client = new Client({
         puppeteer: {
@@ -42,6 +40,7 @@ const app = express();
         console.error("Error during client initialization:", error);
     }
 
+    const app = express();
     app.get('/send', async (req, res) => {
         const { number, message } = req.query;
         if (!number || !message) {
@@ -61,4 +60,5 @@ const app = express();
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
+
 })();
