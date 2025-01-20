@@ -12,8 +12,5 @@
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.21.0"
   },
-  "type": "commonjs",
-  "puppeteer": {
-    "defaultExecutablePath": "/opt/render/project/.cache/puppeteer/chrome/linux-1108766/chrome-linux/chrome"
-  }
+  "type": "commonjs"
 }
