@@ -8,7 +8,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "WhatsApp Web automation with Node.js and Puppeteer",
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",
