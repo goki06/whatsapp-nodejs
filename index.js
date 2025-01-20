@@ -7,9 +7,17 @@ const app = express();
 
 const client = new Client({
     puppeteer: {
-        executablePath: process.env.CHROME_PATH || '/usr/bin/chromium',
+        executablePath: process.env.CHROME_PATH || '/usr/bin/chromium-browser',  // Render erwartet möglicherweise diesen Pfad
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-software-rasterizer',
+            '--disable-extensions',
+            '--disable-background-networking'
+        ],
     },
     authStrategy: new LocalAuth()
 });
@@ -24,11 +32,11 @@ client.on('ready', () => {
 });
 
 client.on('auth_failure', msg => {
-    console.error('AUTHENTICATION FAILURE', msg);
+    console.error('AUTHENTICATION FAILURE:', msg);
 });
 
 client.on('disconnected', reason => {
-    console.log('Client was logged out', reason);
+    console.log('Client was logged out:', reason);
 });
 
 app.get('/send', async (req, res) => {
