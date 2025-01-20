@@ -7,15 +7,13 @@ const app = express();
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+        executablePath: puppeteer.executablePath(),
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const client = new Client({
-        puppeteer: {
-            browserWSEndpoint: browser.wsEndpoint()
-        },
+        puppeteer: { browserWSEndpoint: browser.wsEndpoint() },
         authStrategy: new LocalAuth()
     });
 
@@ -28,13 +26,7 @@ const app = express();
         console.log('WhatsApp bot is ready!');
     });
 
-    client.on('auth_failure', msg => {
-        console.error('Authentication failure', msg);
-    });
-
-    client.on('disconnected', reason => {
-        console.log('Client was logged out', reason);
-    });
+    await client.initialize();
 
     app.get('/send', async (req, res) => {
         const { number, message } = req.query;
@@ -42,16 +34,9 @@ const app = express();
             return res.status(400).send('Please provide number and message');
         }
         const chatId = number + "@c.us";
-        try {
-            await client.sendMessage(chatId, message);
-            res.send('Message sent to ' + number);
-        } catch (error) {
-            console.error('Error sending message:', error);
-            res.status(500).send('Failed to send message');
-        }
+        await client.sendMessage(chatId, message);
+        res.send('Message sent to ' + number);
     });
-
-    await client.initialize();
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
