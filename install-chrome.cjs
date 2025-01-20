@@ -2,15 +2,18 @@ const puppeteer = require('puppeteer');
 
 (async () => {
     try {
-        console.log('Installing Chromium using Puppeteer...');
+        console.log('Checking for Chromium installation...');
 
-        const browserFetcher = puppeteer.createBrowserFetcher();
-        const revisionInfo = await browserFetcher.download('1108766');  // Fixierte Revision von Chromium
+        const browser = await puppeteer.launch({
+            executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', 
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
 
-        console.log('Chromium installed successfully at:', revisionInfo.executablePath);
-
+        console.log('Chromium is ready at:', browser.executablePath());
+        await browser.close();
     } catch (error) {
-        console.error('Error installing Chromium:', error);
+        console.error('Error with Puppeteer Chromium:', error);
         process.exit(1);
     }
 })();
