@@ -1,59 +1,61 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 
 const app = express();
 
-// Suche nach einem verfügbaren Chromium-Pfad
-const CHROME_PATH =
-    process.env.CHROME_PATH ||
-    '/usr/bin/chromium' ||
-    '/usr/bin/google-chrome-stable' ||
-    '/usr/bin/google-chrome';
-
-const client = new Client({
-    puppeteer: {
-        executablePath: CHROME_PATH,
+(async () => {
+    // Start Puppeteer mit automatisch installiertem Chromium
+    const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
-    },
-    authStrategy: new LocalAuth()
-});
+    });
 
-client.on('qr', qr => {
-    console.log('Scan this QR code with your WhatsApp app:');
-    qrcode.generate(qr, { small: true });
-});
+    const client = new Client({
+        puppeteer: {
+            browserWSEndpoint: browser.wsEndpoint()
+        },
+        authStrategy: new LocalAuth()
+    });
 
-client.on('ready', () => {
-    console.log('WhatsApp bot is ready!');
-});
+    client.on('qr', qr => {
+        console.log('Scan this QR code with your WhatsApp app:');
+        qrcode.generate(qr, { small: true });
+    });
 
-client.on('disconnected', reason => {
-    console.log('Client was logged out', reason);
-});
+    client.on('ready', () => {
+        console.log('WhatsApp bot is ready!');
+    });
 
-app.get('/send', async (req, res) => {
-    const { number, message } = req.query;
-    if (!number || !message) {
-        return res.status(400).send('Please provide number and message');
-    }
+    client.on('disconnected', reason => {
+        console.log('Client was logged out', reason);
+    });
+
     try {
-        const chatId = number + "@c.us";
-        await client.sendMessage(chatId, message);
-        res.send('Message sent to ' + number);
+        await client.initialize();
+        console.log("Client initialized successfully");
     } catch (error) {
-        console.error("Error sending message:", error);
-        res.status(500).send('Failed to send message');
+        console.error("Error during client initialization:", error);
     }
-});
 
-client.initialize().catch(error => {
-    console.error("Error during client initialization:", error);
-});
+    app.get('/send', async (req, res) => {
+        const { number, message } = req.query;
+        if (!number || !message) {
+            return res.status(400).send('Please provide number and message');
+        }
+        try {
+            const chatId = number + "@c.us";
+            await client.sendMessage(chatId, message);
+            res.send('Message sent to ' + number);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            res.status(500).send('Failed to send message');
+        }
+    });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+})();
