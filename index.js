@@ -6,24 +6,23 @@ const puppeteer = require('puppeteer');
 const app = express();
 
 (async () => {
-    const browserFetcher = puppeteer.createBrowserFetcher();
-    const revisionInfo = await browserFetcher.download('1259');  // Stelle sicher, dass Puppeteer Chromium herunterlädt
+    console.log("Downloading Chromium...");
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--disable-software-rasterizer',
+            '--disable-background-timer-throttling',
+            '--disable-renderer-backgrounding',
+            '--disable-backgrounding-occluded-windows'
+        ],
+    });
 
     const client = new Client({
-        puppeteer: {
-            executablePath: revisionInfo.executablePath,
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--disable-software-rasterizer',
-                '--disable-background-timer-throttling',
-                '--disable-renderer-backgrounding',
-                '--disable-backgrounding-occluded-windows'
-            ],
-        },
+        puppeteer: { browser },
         authStrategy: new LocalAuth()
     });
 
@@ -70,4 +69,5 @@ const app = express();
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     });
+
 })();
