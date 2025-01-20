@@ -7,11 +7,11 @@ const app = express();
 
 const client = new Client({
     puppeteer: {
-        executablePath: puppeteer.executablePath(),  // Verwende eingebettetes Chromium
-        headless: true,  // Versteckter Modus für Serverumgebungen
-        args: ['--no-sandbox', '--disable-setuid-sandbox']  // Notwendige Argumente für Render
+        executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome-stable',  // Render erwartet den Chrome-Pfad
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     },
-    authStrategy: new LocalAuth()  // Speichert die Sitzung lokal
+    authStrategy: new LocalAuth()
 });
 
 client.on('qr', qr => {
@@ -29,13 +29,8 @@ app.get('/send', async (req, res) => {
         return res.status(400).send('Please provide number and message');
     }
     const chatId = number + "@c.us";
-    try {
-        await client.sendMessage(chatId, message);
-        res.send('Message sent to ' + number);
-    } catch (error) {
-        console.error("Failed to send message:", error);
-        res.status(500).send("Failed to send message");
-    }
+    await client.sendMessage(chatId, message);
+    res.send('Message sent to ' + number);
 });
 
 client.initialize();
