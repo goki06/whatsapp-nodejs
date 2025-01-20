@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "node install-chrome.cjs"
+    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 node install-chrome.cjs"
   },
   "dependencies": {
     "express": "^4.21.2",
