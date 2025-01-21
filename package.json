@@ -1,12 +1,13 @@
 {
   "name": "whatsapp-nodejs",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npx puppeteer browsers install chrome"
-  },
+  "start": "node index.js",
+  "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false PUPPETEER_EXECUTABLE_PATH=$(npx puppeteer browsers install chrome | tail -n 1) node install-chrome.cjs"
+}
+,
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",
