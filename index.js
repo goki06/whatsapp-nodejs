@@ -5,17 +5,21 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const app = express();
 let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
 
+// Client-Status-Tracking
+let isClientReady = false;
+
+// Erstelle den WhatsApp Client
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
         args: [
-            '--no-sandbox',                // Wichtig für Root-Benutzer
-            '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
-            '--disable-dev-shm-usage',     // Vermeidet Speicherprobleme
-            '--disable-gpu',               // Deaktiviert GPU-Nutzung
-            '--no-zygote',                 // Verhindert Sandbox-Probleme
-            '--single-process'             // Verhindert Multi-Prozess-Modus
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-zygote',
+            '--single-process'
         ]
     }
 });
@@ -33,18 +37,30 @@ client.on('qr', async qr => {
 
 // Event Listener für erfolgreiche Verbindung
 client.on('ready', () => {
+    isClientReady = true;
     console.log('WhatsApp-Bot ist bereit!');
 });
 
 // Event Listener für Verbindungsabbrüche
 client.on('disconnected', (reason) => {
+    isClientReady = false;
     console.log('WhatsApp-Bot wurde getrennt:', reason);
-    // Optional: Automatische Wiederverbindung oder Neustart der App
+    // Versuch, den Client neu zu starten
+    setTimeout(() => {
+        console.log('Versuche, den WhatsApp-Bot neu zu starten...');
+        client.initialize();
+    }, 5000); // Warte 5 Sekunden vor dem Neustart
 });
 
 // Event Listener für Authentifizierungsfehler
 client.on('auth_failure', (msg) => {
+    isClientReady = false;
     console.error('Authentifizierungsfehler:', msg);
+    // Möglicherweise solltest du den Client hier neu starten
+    setTimeout(() => {
+        console.log('Versuche, den WhatsApp-Bot neu zu starten nach Auth-Fehler...');
+        client.initialize();
+    }, 5000); // Warte 5 Sekunden vor dem Neustart
 });
 
 // API-Endpunkt zum Senden von Nachrichten
@@ -53,8 +69,19 @@ app.get('/send', async (req, res) => {
     if (!number || !message) {
         return res.status(400).send('Bitte gib Nummer und Nachricht an');
     }
-    const chatId = number.includes('@c.us') ? number : `${number}@c.us`;
+    const formattedNumber = number.replace(/\D/g, ''); // Entferne alle Nicht-Zahlen
+    const chatId = `${formattedNumber}@c.us`;
+
+    if (!isClientReady) {
+        return res.status(503).send('WhatsApp-Bot ist nicht bereit. Versuche es später erneut.');
+    }
+
     try {
+        const isRegistered = await client.isRegisteredUser(chatId);
+        if (!isRegistered) {
+            return res.status(400).send('Die Nummer ist nicht bei WhatsApp registriert.');
+        }
+
         await client.sendMessage(chatId, message);
         res.send(`Nachricht an ${number} gesendet`);
     } catch (error) {
@@ -73,6 +100,17 @@ app.get('/qr', (req, res) => {
     } else {
         res.send('QR-Code wird generiert, bitte warten...');
     }
+});
+
+// Event Listener für empfangene Nachrichten (optional)
+client.on('message', msg => {
+    console.log(`Neue Nachricht von: ${msg.from}, Inhalt: ${msg.body}`);
+    // Optional: Auto-Antwort hinzufügen
+    /*
+    if (msg.body.toLowerCase() === 'hallo') {
+        msg.reply('Hallo! Ich bin dein WhatsApp-Bot.');
+    }
+    */
 });
 
 // Initialisiere den WhatsApp-Client
