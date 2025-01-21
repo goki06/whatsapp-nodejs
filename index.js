@@ -1,6 +1,7 @@
 const express = require('express');
 const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const path = require('path');
 
 const app = express();
 let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
@@ -8,20 +9,23 @@ let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
 // Client-Status-Tracking
 let isClientReady = false;
 
-// Erstelle den WhatsApp Client mit optimierten Puppeteer-Flags
+// Erstelle den WhatsApp Client mit optimierten Puppeteer-Flags und persistentem Speicherpfad
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({
+        clientId: "whatsapp-bot",
+        dataPath: "/mnt/whatsapp-session" // Pfad des Railway Volumes
+    }),
     puppeteer: {
         headless: true,
         args: [
-            '--no-sandbox',                // Wichtig für Root-Benutzer
-            '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
-            '--disable-dev-shm-usage',     // Vermeidet Speicherprobleme
-            '--disable-gpu',               // Deaktiviert GPU-Nutzung
-            '--no-zygote',                 // Verhindert Sandbox-Probleme
-            '--single-process',            // Verhindert Multi-Prozess-Modus
-            '--disable-accelerated-2d-canvas', // Reduziert Speicherverbrauch
-            '--window-size=1920,1080'      // Standardfenstergröße
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-zygote',
+            '--single-process',
+            '--disable-accelerated-2d-canvas',
+            '--window-size=1920,1080'
         ]
     }
 });
@@ -58,7 +62,7 @@ client.on('disconnected', (reason) => {
 client.on('auth_failure', (msg) => {
     isClientReady = false;
     console.error('Authentifizierungsfehler:', msg);
-    // Möglicherweise solltest du den Client hier neu starten
+    // Versuch, den Client neu zu starten
     setTimeout(() => {
         console.log('Versuche, den WhatsApp-Bot nach Auth-Fehler neu zu starten...');
         client.initialize();
