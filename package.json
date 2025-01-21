@@ -1,12 +1,13 @@
 {
   "name": "whatsapp-nodejs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "commonjs",
   "main": "index.js",
 "scripts": {
   "start": "node index.js",
-  "postinstall": "npx puppeteer browsers install chrome && node install-chrome.cjs"
-},
+  "postinstall": "npx puppeteer browsers install chrome"
+}
+,
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",

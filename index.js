@@ -12,10 +12,17 @@ const app = express();
         const browser = await puppeteer.launch({
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: [
+                '--no-sandbox',                
+                '--disable-setuid-sandbox',    
+                '--disable-dev-shm-usage',     
+                '--disable-gpu',               
+                '--single-process',            
+                '--no-zygote'                  
+            ]
         });
 
-        console.log('Chromium erfolgreich gestartet unter:', process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath());
+        console.log('Chromium erfolgreich gestartet unter:', browser.wsEndpoint());
         await browser.close();
     } catch (error) {
         console.error('Fehler bei der Chromium-Installation mit Puppeteer:', error);
