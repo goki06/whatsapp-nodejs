@@ -1,7 +1,7 @@
 const express = require('express');
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const fs = require('fs');
 
 const app = express();
@@ -9,14 +9,13 @@ const app = express();
 // Lese den gespeicherten Chromium-Pfad
 const chromiumPath = fs.existsSync('.chromium-path')
     ? fs.readFileSync('.chromium-path', 'utf8').trim()
-    : null;
+    : process.env.CHROME_BIN || '/usr/bin/chromium-browser';
 
 if (!chromiumPath) {
     console.error('Chromium executable not found.');
     process.exit(1);
 }
 
-// Starte den Puppeteer-Client mit dem gespeicherten Chromium-Pfad
 (async () => {
     try {
         console.log('Starte Puppeteer mit Chromium von:', chromiumPath);
