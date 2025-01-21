@@ -9,7 +9,9 @@ const puppeteer = require('puppeteer');
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        console.log('Chromium erfolgreich gestartet unter WebSocket Endpoint:', browser.wsEndpoint());
+        const browserWSEndpoint = browser.wsEndpoint();
+        console.log('Chromium erfolgreich gestartet unter WebSocket Endpoint:', browserWSEndpoint);
+
         await browser.close();
     } catch (error) {
         console.error('Fehler bei der Chromium-Installation mit Puppeteer:', error);

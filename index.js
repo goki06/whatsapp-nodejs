@@ -1,7 +1,9 @@
-const express = require('express');
-const qrcode = require('qrcode-terminal');
-const puppeteer = require('puppeteer');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+import express from 'express';
+import qrcode from 'qrcode-terminal';
+import puppeteer from 'puppeteer';
+import whatsappWeb from 'whatsapp-web.js';
+
+const { Client, LocalAuth } = whatsappWeb;
 
 const app = express();
 
