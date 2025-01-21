@@ -4,13 +4,14 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
 
-        // Direktes Starten von Puppeteer mit der automatisch heruntergeladenen Version
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        console.log('Chromium erfolgreich gestartet unter:', browser.executablePath());
+        const browserWSEndpoint = browser.wsEndpoint();
+        console.log('Chromium erfolgreich gestartet unter WebSocket Endpoint:', browserWSEndpoint);
+
         await browser.close();
     } catch (error) {
         console.error('Fehler bei der Chromium-Installation mit Puppeteer:', error);
