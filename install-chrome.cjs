@@ -4,15 +4,11 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
         
-        // Puppeteer verwendet seine eigene Chromium-Version
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
+        const browserFetcher = puppeteer.createBrowserFetcher();
+        const revisionInfo = await browserFetcher.download(puppeteer.browserRevision());
+        
+        console.log('Chromium erfolgreich installiert:', revisionInfo.executablePath);
 
-        console.log('Chromium-Installation erfolgreich. Pfad:', browser.process().spawnfile);
-
-        await browser.close();
         process.exit(0);
 
     } catch (error) {

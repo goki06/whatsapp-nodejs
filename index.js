@@ -9,6 +9,7 @@ const app = express();
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: puppeteer.executablePath()  // Automatische Erkennung des Puppeteer Chromium
     });
 
     const client = new Client({
