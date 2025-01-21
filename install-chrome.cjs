@@ -4,14 +4,15 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
 
-        // Verwende Umgebungsvariable für den Chromium-Pfad
+        const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser';
+
         const browser = await puppeteer.launch({
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/opt/render/project/.cache/puppeteer/chrome/linux-1108766/chrome-linux/chrome',
+            executablePath: executablePath,
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        console.log('Chromium wurde erfolgreich installiert unter:', browser.executablePath());
+        console.log('Chromium wurde erfolgreich gestartet unter:', browser.executablePath());
         await browser.close();
     } catch (error) {
         console.error('Fehler bei der Chromium-Installation mit Puppeteer:', error);
