@@ -4,20 +4,13 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
 
-        // Lade Chromium mit Puppeteer herunter
-        const browserFetcher = puppeteer.createBrowserFetcher();
-        const revisionInfo = await browserFetcher.download(puppeteer.PUPPETEER_REVISIONS.chromium);
-
-        console.log('Chromium erfolgreich heruntergeladen:', revisionInfo.executablePath);
-
-        console.log('Starte Chromium-Test...');
+        // Starte den Browser mit einer direkten Installation über Puppeteer
         const browser = await puppeteer.launch({
-            executablePath: revisionInfo.executablePath,
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        console.log('Chromium läuft erfolgreich.');
+        console.log('Chromium wurde erfolgreich installiert und läuft.');
         await browser.close();
         process.exit(0);
 
