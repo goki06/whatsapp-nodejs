@@ -25,7 +25,29 @@ const client = new Client({
             '--no-zygote',
             '--single-process',
             '--disable-accelerated-2d-canvas',
-            '--window-size=1920,1080'
+            '--window-size=1920,1080',
+            '--disable-extensions',
+            '--disable-web-security',
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--no-first-run',
+            '--disable-background-networking',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-breakpad',
+            '--disable-client-side-phishing-detection',
+            '--disable-component-update',
+            '--disable-domain-reliability',
+            '--disable-features=AudioServiceOutOfProcess',
+            '--disable-hang-monitor',
+            '--disable-ipc-flooding-protection',
+            '--disable-notifications',
+            '--disable-offer-store-unmasked-wallet-cards',
+            '--disable-popup-blocking',
+            '--disable-prompt-on-repost',
+            '--disable-renderer-backgrounding',
+            '--disable-sync',
+            '--metrics-recording-only',
+            '--safebrowsing-disable-auto-update'
         ]
     }
 });
