@@ -4,9 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npx puppeteer browsers install chrome && node install-chrome.cjs"
-  },
+  "start": "node index.js",
+  "postinstall": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npx puppeteer browsers install chrome && node install-chrome.cjs"
+},
   "dependencies": {
     "express": "^4.21.2",
     "puppeteer": "^24.1.0",

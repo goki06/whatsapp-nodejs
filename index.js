@@ -9,10 +9,11 @@ const app = express();
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: puppeteer.executablePath(),
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
+    
 
     const client = new Client({
         puppeteer: {
