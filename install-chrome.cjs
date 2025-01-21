@@ -4,12 +4,10 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
 
-        // Chromium-Installation erzwingen
-        await puppeteer.createBrowserFetcher().download('1273080');  // Version 127.0.6533.88
-
+        // Direktes Starten von Puppeteer mit der automatisch heruntergeladenen Version
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
         console.log('Chromium erfolgreich gestartet unter:', browser.executablePath());
