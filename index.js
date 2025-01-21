@@ -1,7 +1,6 @@
 const express = require('express');
 const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const path = require('path');
 
 const app = express();
 let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
@@ -21,6 +20,7 @@ const client = new Client({
     }
 });
 
+// Event Listener für QR-Code
 client.on('qr', async qr => {
     try {
         // Generiere einen Base64-String des QR-Codes
@@ -31,22 +31,35 @@ client.on('qr', async qr => {
     }
 });
 
+// Event Listener für erfolgreiche Verbindung
 client.on('ready', () => {
     console.log('WhatsApp-Bot ist bereit!');
 });
 
+// Event Listener für Verbindungsabbrüche
+client.on('disconnected', (reason) => {
+    console.log('WhatsApp-Bot wurde getrennt:', reason);
+    // Optional: Automatische Wiederverbindung oder Neustart der App
+});
+
+// Event Listener für Authentifizierungsfehler
+client.on('auth_failure', (msg) => {
+    console.error('Authentifizierungsfehler:', msg);
+});
+
+// API-Endpunkt zum Senden von Nachrichten
 app.get('/send', async (req, res) => {
     const { number, message } = req.query;
     if (!number || !message) {
         return res.status(400).send('Bitte gib Nummer und Nachricht an');
     }
-    const chatId = `${number}@c.us`;
+    const chatId = number.includes('@c.us') ? number : `${number}@c.us`;
     try {
         await client.sendMessage(chatId, message);
         res.send(`Nachricht an ${number} gesendet`);
-    } catch (err) {
-        console.error('Fehler beim Senden der Nachricht:', err);
-        res.status(500).send('Fehler beim Senden der Nachricht');
+    } catch (error) {
+        console.error('Fehler beim Senden der Nachricht:', error);
+        res.status(500).send(`Fehler beim Senden der Nachricht: ${error.message}`);
     }
 });
 
@@ -62,8 +75,10 @@ app.get('/qr', (req, res) => {
     }
 });
 
+// Initialisiere den WhatsApp-Client
 client.initialize();
 
+// Starte den Server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
