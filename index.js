@@ -13,12 +13,12 @@ const app = express();
             executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
             headless: true,
             args: [
-                '--no-sandbox',                
-                '--disable-setuid-sandbox',    
-                '--disable-dev-shm-usage',     
-                '--disable-gpu',               
-                '--single-process',            
-                '--no-zygote'                  
+                '--no-sandbox',                // Wichtig für root-Benutzer
+                '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
+                '--disable-gpu',               // GPU-Nutzung deaktivieren
+                '--disable-dev-shm-usage',     // Shared Memory Nutzung deaktivieren
+                '--no-zygote',                 // Sicherheitsprozess abschalten
+                '--single-process'             // Multi-Prozess verhindern
             ]
         });
 
@@ -30,7 +30,18 @@ const app = express();
     }
 
     const client = new Client({
-        authStrategy: new LocalAuth()
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--no-zygote',
+                '--single-process'
+            ]
+        }
     });
 
     client.on('qr', qr => {
