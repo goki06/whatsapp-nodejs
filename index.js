@@ -1,36 +1,38 @@
 const express = require('express');
 const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const fs = require('fs');
+const path = require('path');
 
 const app = express();
-let qrCodeString = '';
+let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
 
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
         args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-zygote',
-            '--single-process'
+            '--no-sandbox',                // Wichtig für Root-Benutzer
+            '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
+            '--disable-dev-shm-usage',     // Vermeidet Speicherprobleme
+            '--disable-gpu',               // Deaktiviert GPU-Nutzung
+            '--no-zygote',                 // Verhindert Sandbox-Probleme
+            '--single-process'             // Verhindert Multi-Prozess-Modus
         ]
     }
 });
 
-client.on('qr', qr => {
-    qrCodeString = qr;
-    qrcode.toFile('public/qr-code.png', qr, function (err) {
-        if (err) console.error('Fehler beim Erstellen des QR-Codes:', err);
-        else console.log('QR-Code gespeichert unter /public/qr-code.png');
-    });
+client.on('qr', async qr => {
+    try {
+        // Generiere einen Base64-String des QR-Codes
+        qrCodeDataURL = await qrcode.toDataURL(qr);
+        console.log('QR-Code generiert und verfügbar unter /qr');
+    } catch (err) {
+        console.error('Fehler beim Generieren des QR-Codes:', err);
+    }
 });
 
 client.on('ready', () => {
-    console.log('WhatsApp bot ist bereit!');
+    console.log('WhatsApp-Bot ist bereit!');
 });
 
 app.get('/send', async (req, res) => {
@@ -39,19 +41,30 @@ app.get('/send', async (req, res) => {
         return res.status(400).send('Bitte gib Nummer und Nachricht an');
     }
     const chatId = `${number}@c.us`;
-    await client.sendMessage(chatId, message);
-    res.send(`Nachricht an ${number} gesendet`);
+    try {
+        await client.sendMessage(chatId, message);
+        res.send(`Nachricht an ${number} gesendet`);
+    } catch (err) {
+        console.error('Fehler beim Senden der Nachricht:', err);
+        res.status(500).send('Fehler beim Senden der Nachricht');
+    }
 });
 
-// Route für QR-Code-Anzeige
-app.use('/public', express.static('public'));
-
+// Route zur Anzeige des QR-Codes als Bild
 app.get('/qr', (req, res) => {
-    res.send('<h1>Scanne den QR-Code</h1><img src="/public/qr-code.png" />');
+    if (qrCodeDataURL) {
+        res.send(`
+            <h1>Scanne den QR-Code mit deinem WhatsApp</h1>
+            <img src="${qrCodeDataURL}" alt="QR Code" />
+        `);
+    } else {
+        res.send('QR-Code wird generiert, bitte warten...');
+    }
 });
 
 client.initialize();
 
-app.listen(process.env.PORT || 8080, () => {
-    console.log('Server läuft auf Port ' + (process.env.PORT || 8080));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`Server läuft auf Port ${PORT}`);
 });
