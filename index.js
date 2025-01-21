@@ -1,6 +1,7 @@
 const express = require('express');
-const qrcode = require('qrcode-terminal');
+const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const fs = require('fs');
 
 const app = express();
 let qrCodeString = '';
@@ -10,20 +11,22 @@ const client = new Client({
     puppeteer: {
         headless: true,
         args: [
-            '--no-sandbox',                // Wichtig für Root-Benutzer
-            '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
-            '--disable-dev-shm-usage',     // Vermeidet Speicherprobleme
-            '--disable-gpu',               // Deaktiviert GPU-Nutzung
-            '--no-zygote',                 // Verhindert Sandbox-Probleme
-            '--single-process'             // Verhindert Multi-Prozess-Modus
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-zygote',
+            '--single-process'
         ]
     }
 });
 
 client.on('qr', qr => {
     qrCodeString = qr;
-    console.log('Scan this QR code:');
-    qrcode.generate(qr, { small: true });
+    qrcode.toFile('public/qr-code.png', qr, function (err) {
+        if (err) console.error('Fehler beim Erstellen des QR-Codes:', err);
+        else console.log('QR-Code gespeichert unter /public/qr-code.png');
+    });
 });
 
 client.on('ready', () => {
@@ -40,14 +43,11 @@ app.get('/send', async (req, res) => {
     res.send(`Nachricht an ${number} gesendet`);
 });
 
-// Neue Route für den QR-Code
+// Route für QR-Code-Anzeige
+app.use('/public', express.static('public'));
+
 app.get('/qr', (req, res) => {
-    if (qrCodeString) {
-        const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrCodeString)}&size=200x200`;
-        res.send(`<img src="${qrImageUrl}" alt="QR Code"/>`);
-    } else {
-        res.send('QR-Code wird generiert, bitte warten...');
-    }
+    res.send('<h1>Scanne den QR-Code</h1><img src="/public/qr-code.png" />');
 });
 
 client.initialize();
