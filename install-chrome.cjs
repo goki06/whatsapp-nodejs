@@ -4,10 +4,7 @@ const puppeteer = require('puppeteer');
     try {
         console.log('Überprüfe die Chromium-Installation mit Puppeteer...');
 
-        const executablePath = process.env.CHROME_BIN || '/usr/bin/chromium-browser';
-
         const browser = await puppeteer.launch({
-            executablePath: executablePath,
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
