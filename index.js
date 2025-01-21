@@ -8,18 +8,20 @@ let qrCodeDataURL = ''; // Variable zur Speicherung des QR-Codes als Base64
 // Client-Status-Tracking
 let isClientReady = false;
 
-// Erstelle den WhatsApp Client
+// Erstelle den WhatsApp Client mit optimierten Puppeteer-Flags
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
         args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-zygote',
-            '--single-process'
+            '--no-sandbox',                // Wichtig für Root-Benutzer
+            '--disable-setuid-sandbox',    // Deaktiviert setuid Sandbox
+            '--disable-dev-shm-usage',     // Vermeidet Speicherprobleme
+            '--disable-gpu',               // Deaktiviert GPU-Nutzung
+            '--no-zygote',                 // Verhindert Sandbox-Probleme
+            '--single-process',            // Verhindert Multi-Prozess-Modus
+            '--disable-accelerated-2d-canvas', // Reduziert Speicherverbrauch
+            '--window-size=1920,1080'      // Standardfenstergröße
         ]
     }
 });
@@ -58,9 +60,20 @@ client.on('auth_failure', (msg) => {
     console.error('Authentifizierungsfehler:', msg);
     // Möglicherweise solltest du den Client hier neu starten
     setTimeout(() => {
-        console.log('Versuche, den WhatsApp-Bot neu zu starten nach Auth-Fehler...');
+        console.log('Versuche, den WhatsApp-Bot nach Auth-Fehler neu zu starten...');
         client.initialize();
     }, 5000); // Warte 5 Sekunden vor dem Neustart
+});
+
+// Event Listener für empfangene Nachrichten (optional)
+client.on('message', msg => {
+    console.log(`Neue Nachricht von: ${msg.from}, Inhalt: ${msg.body}`);
+    // Optional: Auto-Antwort hinzufügen
+    /*
+    if (msg.body.toLowerCase() === 'hallo') {
+        msg.reply('Hallo! Ich bin dein WhatsApp-Bot.');
+    }
+    */
 });
 
 // API-Endpunkt zum Senden von Nachrichten
@@ -100,17 +113,6 @@ app.get('/qr', (req, res) => {
     } else {
         res.send('QR-Code wird generiert, bitte warten...');
     }
-});
-
-// Event Listener für empfangene Nachrichten (optional)
-client.on('message', msg => {
-    console.log(`Neue Nachricht von: ${msg.from}, Inhalt: ${msg.body}`);
-    // Optional: Auto-Antwort hinzufügen
-    /*
-    if (msg.body.toLowerCase() === 'hallo') {
-        msg.reply('Hallo! Ich bin dein WhatsApp-Bot.');
-    }
-    */
 });
 
 // Initialisiere den WhatsApp-Client
