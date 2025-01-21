@@ -7,14 +7,13 @@ const app = express();
 
 (async () => {
     const browser = await puppeteer.launch({
-        executablePath: puppeteer.executablePath(),
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const client = new Client({
         puppeteer: { browserWSEndpoint: browser.wsEndpoint() },
-        authStrategy: new LocalAuth()
+        authStrategy: new LocalAuth(),
     });
 
     client.on('qr', qr => {
